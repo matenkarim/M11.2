@@ -1,18 +1,104 @@
-window.onload = loaded;
+document.addEventListener("DOMContentLoaded", function () {
+    // load items button
+    const loadItemsButton = document.getElementById('load-items');
+    loadItemsButton.addEventListener('click', loadItems);
 
-/**
- * Simple Function that will be run when the browser is finished loading.
- */
-function loaded() {
-    // Assign to a variable so we can set a breakpoint in the debugger!
-    const hello = sayHello();
-    console.log(hello);
-}
+    // Add Item button
+    const addItemButton = document.getElementById('add-item');
+    addItemButton.addEventListener('click', addItem);
 
-/**
- * This function returns the string 'hello'
- * @return {string} the string hello
- */
-export function sayHello() {
-    return 'hello';
-}
+    // Load Items Function
+    function loadItems() {
+        fetch("https://m3kv7ya2q4.execute-api.us-east-2.amazonaws.com/items")
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('table-body');
+                tableBody.innerHTML = '';
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.id}</td>
+                        <td>${row.name}</td>
+                        <td>${row.price}</td>
+                        <td><button class="delete-btn" data-id="${row.id}">Delete</button></td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                // Delete Item button
+                const deleteButtons = document.querySelectorAll('.delete-btn');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', () => deleteItem(button.dataset.id));
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Delete Item Function
+    function deleteItem(id) {
+        fetch(`https://m3kv7ya2q4.execute-api.us-east-2.amazonaws.com/items/${id}`, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Item with ID ${id} deleted successfully');
+                loadItems(); // reload items
+            } else {
+                console.error('Error deleting item:', response.statusText);
+            }
+        })
+        .catch(error => console.error('Error deleting item:', error));
+    }
+
+    // Add Item Function
+    function addItem() {
+        const id = document.getElementById('item-id').value;
+        const name = document.getElementById('item-name').value;
+        const price = document.getElementById('item-price').value;
+    
+        if (!id || !name || !price) {
+            console.error("All fields are required");
+            return;
+        }
+    
+        // Fetch existing items to verify if ID is unique
+        fetch('https://m3kv7ya2q4.execute-api.us-east-2.amazonaws.com/items')
+            .then(response => response.json())
+            .then(data => {
+                // Check if the ID already exists
+                const idExists = data.some(item => item.id === id);
+                if (idExists) {
+                    alert('The ID already exists. Please use a unique ID.');
+                    return;
+                }
+    
+                // Proceed to add the item if the ID is unique
+                const newItem = {
+                    id: id,
+                    name: name,
+                    price: price
+                };
+    
+                fetch('https://m3kv7ya2q4.execute-api.us-east-2.amazonaws.com/items', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newItem)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Item added successfully');
+                        loadItems(); // Reload the items after adding a new one
+                    } else {
+                        return response.text().then(text => {
+                            throw new Error(`Error adding item: ${text}`);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            })
+            .catch(error => console.error('Error fetching existing items:', error));
+    }
+    
+});
