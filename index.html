@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Test AWS Lambda</title>
+    <title>The Inventory App</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
@@ -13,33 +13,37 @@
 
 <body>
     <h1>The Inventory App</h1>
+    <div class="container">
 
-    <button id="load-items">Load Items</button>
+        <button id="load-items">Load Table</button>
+        <button id="toggle-table" style="display: none;">Hide Table</button>
 
-    <table id="item-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            <!-- loaded with JavaScript -->
-        </tbody>
-    </table>
+        <table id="item-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
+            <tbody id="table-body">
+                <!-- Loaded with info from database -->
+            </tbody>
+        </table>
 
-    <hr>
-    <div>
+        <hr>
 
-        <input type="text" id="item-id" placeholder="ID">
-        <input type="text" id="item-name" placeholder="Name">
-        <input type="text" id="item-price" placeholder="Price">
-        <button id="add-item">Add Item</button>
+        <div id="new-item">
+
+            <input type="text" id="item-id" placeholder="ID">
+            <input type="text" id="item-name" placeholder="Name">
+            <input type="text" id="item-price" placeholder="Price">
+            <button id="add-item">Add Item</button>
+        </div>
+
     </div>
-
 </body>
 
 <script src="js/main.js"></script>
